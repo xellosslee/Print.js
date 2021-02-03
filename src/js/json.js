@@ -18,17 +18,6 @@ const Json = {
       throw new Error('Invalid properties array for your JSON data.')
     }
 
-    // We will format the property objects to keep the JSON api compatible with older releases
-    params.properties = params.properties.map(property => {
-      return {
-        field: typeof property === 'object' ? property.field : property,
-        displayName: typeof property === 'object' ? property.displayName : property,
-        columnSize: typeof property === 'object' && property.columnSize ? 'width:' + property.columnSize + ';' : 'width:' + (100 / params.properties.length) + '%;',
-        align: typeof property === 'object' && property.align ? 'text-align:' + property.align + ';' : '',
-        headerAlign: typeof property === 'object' && property.headerAlign ? 'text-align:' + property.headerAlign + ';' : '',
-      }
-    })
-
     // Create a print container element
     params.printableElement = document.createElement('div')
 
@@ -47,8 +36,16 @@ const Json = {
   jsonToHTML: function(params) {
     // Get the row and column data
     const data = params.printable
-    const properties = params.properties
-  
+    // We will format the property objects to keep the JSON api compatible with older releases
+    const properties = params.properties.map(property => {
+      return {
+        field: typeof property === 'object' ? property.field : property,
+        displayName: typeof property === 'object' ? property.displayName : property,
+        columnSize: typeof property?.columnSize === 'number' ? ('width:' + property.columnSize + 'px;') : ('width:' + (100 / params.properties.length) + '%;'),
+        align: typeof property?.align === 'string' ? ('text-align:' + property.align + ';') : '',
+        headerAlign: typeof property?.headerAlign === 'string' ? ('text-align:' + property.headerAlign + ';') : '',
+      }
+    })
     // Create a html table
     let htmlData = '<table style="border-collapse: collapse; width: 100%;">'
   
@@ -62,7 +59,7 @@ const Json = {
   
     // Add the table header columns
     for (let n = 0; n < properties.length; n++) {
-      htmlData += '<th style="' + properties[n].columnSize + params.gridHeaderStyle + ';' + properties[n].headerAlign + '">' + capitalizePrint(properties[n].displayName) + '</th>'
+      htmlData += '<th style="' + properties[n].columnSize + ';' + params.gridHeaderStyle + ';' + properties[n].headerAlign + '">' + capitalizePrint(properties[n].displayName) + '</th>'
     }
   
     // Add the closing tag for the table header row
@@ -96,7 +93,7 @@ const Json = {
         }
   
         // Add the row contents and styles
-        htmlData += '<td style="' + properties[n].columnSize + params.gridStyle + ';' + properties[n].align + '">' + stringData + '</td>'
+        htmlData += '<td style="' + properties[n].columnSize + ';' + params.gridStyle + ';' + properties[n].align + '">' + stringData + '</td>'
       }
   
       // Add the row closing tag
