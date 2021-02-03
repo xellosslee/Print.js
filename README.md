@@ -1,3 +1,11 @@
+# forked 이후 추가된 기능 정리
+
+> json형태로 테이블을 그리는 경우 각 컬럼별 정렬 기능 추가 (헤더 정렬은 별도 변수로 지정)
+
+> 고정된 header와 footer를 가지고 가운데에는 json array를 출력하는 문서 양식의 출력을 위해 jsonToHTML 함수를 외부에서 호출 가능하도록 수정
+> 해당 예제는 index.html에 추가
+> 페이지별로 구분하기 위해 예시 html을 작성 (본문&헤더&푸터의 높이에 따라 가운데에 그려지는 json의 row 숫자를 조절할 필요가 있음
+
 # Print.js
 
 [![Build Status](https://travis-ci.org/crabbly/Print.js.svg?branch=master)](https://travis-ci.org/crabbly/Print.js)
