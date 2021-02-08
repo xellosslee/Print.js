@@ -59,7 +59,7 @@ const Json = {
   
     // Add the table header columns
     for (let n = 0; n < properties.length; n++) {
-      htmlData += '<th style="' + properties[n].columnSize + ';' + params.gridHeaderStyle + ';' + properties[n].headerAlign + '">' + capitalizePrint(properties[n].displayName) + '</th>'
+      htmlData += '<th style="' + properties[n].columnSize + params.gridHeaderStyle + properties[n].headerAlign + '">' + capitalizePrint(properties[n].displayName) + '</th>'
     }
   
     // Add the closing tag for the table header row
@@ -86,14 +86,14 @@ const Json = {
         const property = properties[n].field.split('.')
         if (property.length > 1) {
           for (let p = 0; p < property.length; p++) {
-            stringData = stringData[property[p]]
+            stringData = stringData[property[p]] == null ? '' : stringData[property[p]]
           }
         } else {
-          stringData = stringData[properties[n].field]
+          stringData = stringData[properties[n].field] == null ? '' : stringData[properties[n].field]
         }
   
         // Add the row contents and styles
-        htmlData += '<td style="' + properties[n].columnSize + ';' + params.gridStyle + ';' + properties[n].align + '"><div>' + stringData + '</div></td>'
+        htmlData += '<td><div style="' + properties[n].columnSize + params.gridStyle + properties[n].align + '">' + stringData + '</div></td>'
       }
   
       // Add the row closing tag
