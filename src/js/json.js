@@ -93,7 +93,7 @@ const Json = {
         }
   
         // Add the row contents and styles
-        htmlData += '<td><div style="' + properties[n].columnSize + params.gridStyle + properties[n].align + '">' + stringData + '</div></td>'
+        htmlData += '<td style="' + properties[n].columnSize + '"><div style="' + params.gridStyle + properties[n].align + '">' + stringData + '</div></td>'
       }
   
       // Add the row closing tag
