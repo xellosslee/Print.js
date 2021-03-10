@@ -44,6 +44,7 @@ const Json = {
         columnSize: typeof property?.columnSize === 'number' ? ('width:' + property.columnSize + 'px;') : ('width:' + (100 / params.properties.length) + '%;'),
         align: typeof property?.align === 'string' ? ('text-align:' + property.align + ';') : '',
         headerAlign: typeof property?.headerAlign === 'string' ? ('text-align:' + property.headerAlign + ';') : '',
+        mergeRow: typeof property?.mergeRow === 'boolean' ? property.mergeRow : false,
       }
     })
     // Create a html table
@@ -72,7 +73,52 @@ const Json = {
   
     // Create the table body
     htmlData += '<tbody>'
-  
+
+    // Check mergeRow exists
+    if (properties.filter(e => e.mergeRow).length > 0) {
+      let beforeStringData = []
+      let startIdx = []
+      // Init previous parameters
+      for (let i = 0; i < data.length; i++) {
+        for (let n = 0; n < properties.length; n++) {
+          data[i][n + '_hide'] = undefined
+          data[i][n + '_merge'] = undefined
+        }
+      }
+      // calculate mergeRow counts
+      for (let i = 0; i < data.length; i++) {
+        for (let n = 0; n < properties.length; n++) {
+          let stringData = data[i]
+    
+          // Support nested objects
+          const property = properties[n].field.split('.')
+          if (property.length > 1) {
+            for (let p = 0; p < property.length; p++) {
+              stringData = stringData[property[p]] == null ? '' : stringData[property[p]]
+            }
+          } else {
+            stringData = stringData[properties[n].field] == null ? '' : stringData[properties[n].field]
+          }
+          if (beforeStringData[n] === undefined) {
+            beforeStringData[n] = stringData
+          }
+          if (properties[n].mergeRow) {
+            if (beforeStringData[n] == stringData) {
+              if (startIdx[n] === undefined) {
+                startIdx[n] = i
+              } else {
+                data[i][n + '_hide'] = true
+              }
+              data[startIdx[n]][n + '_merge'] = (data[startIdx[n]][n + '_merge'] || 0) + 1
+            } else {
+              startIdx[n] = undefined
+            }
+          }
+          beforeStringData[n] = stringData
+        }
+      }
+    }
+
     // Add the table data rows
     for (let i = 0; i < data.length; i++) {
       // Add the row starting tag
@@ -91,9 +137,17 @@ const Json = {
         } else {
           stringData = stringData[properties[n].field] == null ? '' : stringData[properties[n].field]
         }
-  
-        // Add the row contents and styles
-        htmlData += '<td style="' + properties[n].columnSize + '"><div style="' + params.gridStyle + properties[n].align + '">' + stringData + '</div></td>'
+        let merge = data[i][n + '_merge']
+        let hide = data[i][n + '_hide']
+        if (hide === true) {
+          continue
+        }
+        if (typeof merge === 'number') {
+          htmlData += '<td rowspan="' + merge + '" style="' + properties[n].columnSize + '"><div style="' + params.gridStyle + properties[n].align + '">' + stringData + '</div></td>'
+        } else {
+          // Add the row contents and styles
+          htmlData += '<td style="' + properties[n].columnSize + '"><div style="' + params.gridStyle + properties[n].align + '">' + stringData + '</div></td>'
+        }
       }
   
       // Add the row closing tag
